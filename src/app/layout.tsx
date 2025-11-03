@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NextAuthProvider from "@/providers/NextAuthProvider";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import { userService } from "./services/userService";
@@ -50,7 +49,6 @@ export default async function RootLayout({
               
               {children}
 
-              <Footer></Footer>
             </CartProvider>
           </UserProvider>
         </NextAuthProvider>
