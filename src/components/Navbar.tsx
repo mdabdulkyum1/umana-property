@@ -1,25 +1,18 @@
-"use client"
+"use client";
 
 import { usePathname } from "next/navigation";
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { useState } from 'react';
-import { FiMenu, FiX } from 'react-icons/fi';
-import { signOut, useSession } from 'next-auth/react';
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { useState } from "react";
+import { FiMenu, FiX } from "react-icons/fi";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
-import { ShoppingCart } from "lucide-react";
-import { useCart } from "@/providers/CartProvider";
-import { useUserStore } from "@/stores/userStore";
 
 export default function Navbar() {
-  const user = useUserStore((state) => state.user);
   const pathname = usePathname();
-  
   const { data: session, status } = useSession();
-  const { getTotalItems } = useCart();
-  const isLoggedIn = status === 'authenticated';
+  const isLoggedIn = status === "authenticated";
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
 
   const navItemVariants = {
     hidden: { opacity: 0, y: -10 },
@@ -28,15 +21,15 @@ export default function Navbar() {
 
   const mobileMenuVariants = {
     hidden: { opacity: 0, height: 0 },
-    visible: { opacity: 1, height: 'auto', transition: { duration: 0.3 } },
+    visible: { opacity: 1, height: "auto", transition: { duration: 0.3 } },
   };
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: '/' });
+    await signOut({ callbackUrl: "/" });
     setIsMobileMenuOpen(false);
   };
 
-   const hideNavbar = pathname.startsWith("/dashboard");
+  const hideNavbar = pathname.startsWith("/dashboard");
 
   if (!hideNavbar) {
     return (
@@ -44,60 +37,59 @@ export default function Navbar() {
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="bg-white shadow-md sticky top-0 z-50"
+        className="bg-white/90 backdrop-blur-lg shadow-sm sticky top-0 z-50 border-b border-[#E1E9EE]"
       >
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent hover:from-indigo-700 hover:to-purple-700 transition-all duration-200">
-            Neo Market
+          <Link
+            href="/"
+            className="text-2xl font-bold text-[#0073B1] hover:text-[#2867B2] transition-colors duration-300"
+          >
+            Umana Property
           </Link>
-  
+
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
             <motion.div variants={navItemVariants} initial="hidden" animate="visible">
-              <Link href="/" className="text-gray-800 hover:text-indigo-500 transition">
+              <Link
+                href="/"
+                className="text-[#212121] font-medium hover:text-[#0073B1] transition-colors"
+              >
                 Home
               </Link>
             </motion.div>
-            <motion.div variants={navItemVariants} initial="hidden" animate="visible">
-              <Link href="/products" className="text-gray-800 hover:text-indigo-500 transition">
-                Products
-              </Link>
-            </motion.div>
-            <motion.div variants={navItemVariants} initial="hidden" animate="visible">
-              <Link href="/checkout" className="relative text-gray-800 hover:text-indigo-500 transition">
-                <ShoppingCart className="w-5 h-5" />
-                {getTotalItems() > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {getTotalItems()}
-                  </span>
-                )}
-              </Link>
-            </motion.div>
+
+            {isLoggedIn && (
+              <motion.div variants={navItemVariants} initial="hidden" animate="visible">
+                <Link
+                  href="/dashboard"
+                  className="text-[#212121] font-medium hover:text-[#0073B1] transition-colors"
+                >
+                  Dashboard
+                </Link>
+              </motion.div>
+            )}
+
             {isLoggedIn ? (
               <>
                 <motion.div variants={navItemVariants} initial="hidden" animate="visible">
-                  <Link
-                    href="/dashboard"
-                    className="text-gray-800 hover:text-indigo-500 transition"
-                  >
-                    Dashboard
-                  </Link>
-                </motion.div>
-                <motion.div variants={navItemVariants} initial="hidden" animate="visible">
                   <Image
-                        src={user?.image || "https://ui-avatars.com/api/?name=User+Name&background=0073B1&color=fff"}
-                        alt="User"
-                        width={32}
-                        height={32}
-                        className="rounded-full"
-                        title={session.user?.name}
-                      />
+                    src={
+                      session?.user?.image ||
+                      "https://ui-avatars.com/api/?name=User+Name&background=0073B1&color=fff"
+                    }
+                    alt="User"
+                    width={36}
+                    height={36}
+                    className="rounded-full border border-[#0073B1]"
+                    title={session.user?.name || "User"}
+                  />
                 </motion.div>
+
                 <motion.div variants={navItemVariants} initial="hidden" animate="visible">
                   <button
                     onClick={handleLogout}
-                    className="text-gray-800 hover:text-indigo-500 transition"
+                    className="text-[#212121] hover:text-[#D32F2F] font-medium transition-colors"
                   >
                     Logout
                   </button>
@@ -108,15 +100,16 @@ export default function Navbar() {
                 <motion.div variants={navItemVariants} initial="hidden" animate="visible">
                   <Link
                     href="/login"
-                    className="text-gray-800 hover:text-indigo-500 transition"
+                    className="text-[#212121] font-medium hover:text-[#0073B1] transition-colors"
                   >
                     Login
                   </Link>
                 </motion.div>
+
                 <motion.div variants={navItemVariants} initial="hidden" animate="visible">
                   <Link
                     href="/register"
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-2 rounded-full hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                    className="bg-[#0073B1] text-white px-6 py-2 rounded-2xl font-medium hover:bg-[#005F8F] transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
                   >
                     Register
                   </Link>
@@ -124,81 +117,62 @@ export default function Navbar() {
               </>
             )}
           </div>
-  
+
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-gray-800"
+            className="md:hidden text-[#212121]"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
           </button>
         </div>
-  
+
         {/* Mobile Menu */}
         <motion.div
           variants={mobileMenuVariants}
           initial="hidden"
-          animate={isMobileMenuOpen ? 'visible' : 'hidden'}
-          className="md:hidden bg-gray-50"
+          animate={isMobileMenuOpen ? "visible" : "hidden"}
+          className="md:hidden bg-[#F3F6F8] border-t border-[#E1E9EE]"
         >
           <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
             <Link
               href="/"
-              className="text-gray-800 hover:text-indigo-500 transition"
+              className="text-[#212121] hover:text-[#0073B1] font-medium transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Home
             </Link>
-            <Link
-              href="/products"
-              className="text-gray-800 hover:text-indigo-500 transition"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Products
-            </Link>
-            <Link
-              href="/checkout"
-              className="relative text-gray-800 hover:text-indigo-500 transition"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <div className="flex items-center gap-2">
-                <ShoppingCart className="w-5 h-5" />
-                <span>Cart</span>
-                {getTotalItems() > 0 && (
-                  <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {getTotalItems()}
-                  </span>
-                )}
-              </div>
-            </Link>
+
+            {isLoggedIn && (
+              <Link
+                href="/dashboard"
+                className="text-[#212121] hover:text-[#0073B1] font-medium transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
+            )}
+
             {isLoggedIn ? (
-              <>
-                <Link
-                  href="/dashboard"
-                  className="text-gray-800 hover:text-indigo-500 transition"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Dashboard
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="text-gray-800 hover:text-indigo-500 transition text-left"
-                >
-                  Logout
-                </button>
-              </>
+              <button
+                onClick={handleLogout}
+                className="text-[#212121] hover:text-[#D32F2F] font-medium text-left transition-colors"
+              >
+                Logout
+              </button>
             ) : (
               <>
                 <Link
                   href="/login"
-                  className="text-gray-800 hover:text-indigo-500 transition"
+                  className="text-[#212121] hover:text-[#0073B1] font-medium transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Login
                 </Link>
+
                 <Link
                   href="/register"
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-2 rounded-full text-center hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                  className="bg-[#0073B1] text-white px-6 py-2 rounded-2xl text-center font-medium hover:bg-[#005F8F] transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Register
@@ -210,5 +184,4 @@ export default function Navbar() {
       </motion.nav>
     );
   }
-
 }
