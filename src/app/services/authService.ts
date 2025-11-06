@@ -2,9 +2,10 @@ import axios from "@/lib/api";
 
 interface RegisterPayload {
   name: string;
+  fatherName: string; 
+  phone: string;
   email: string;
   password: string;
-  referralCode?: string;
 }
 
 interface LoginPayload {

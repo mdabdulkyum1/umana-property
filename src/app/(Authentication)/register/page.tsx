@@ -1,16 +1,13 @@
 "use client";
 
 import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import { RegisterForm } from "../components/RegisterForm";
+import RegisterForm from "../components/RegisterForm";
 
 function RegisterPageContent() {
-  const searchParams = useSearchParams();
-  const referralCode = searchParams.get("r") || undefined;
 
   return (
     <div>
-      <RegisterForm referralCode={referralCode} />
+      <RegisterForm />
     </div>
   );
 }
