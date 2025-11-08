@@ -46,9 +46,8 @@ export default function Sidebar() {
               className="text-2xl font-bold text-indigo-600 hover:text-indigo-700 transition-colors duration-200"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Neo Market
+              Umana Property
             </Link>
-            <p className="text-sm text-gray-500 mt-1">Referral Platform</p>
           </div>
 
           {/* Navigation */}

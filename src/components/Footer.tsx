@@ -32,10 +32,10 @@ export default function Footer() {
           {/* About Section */}
           <motion.div variants={footerItemVariants}>
             <h3 className="text-lg font-semibold mb-4 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-              About Neo Market
+              About Umana Property
             </h3>
             <p className="text-gray-300">
-              Neo Market is a modern referral platform where you can earn credits by
+              Umana Property is a modern referral platform where you can earn credits by
               referring friends. Join our community and start sharing today!
             </p>
           </motion.div>
@@ -145,7 +145,7 @@ export default function Footer() {
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-gray-400">
-              &copy; {new Date().getFullYear()} Neo Market. All rights reserved.
+              &copy; {new Date().getFullYear()} Umana Property. All rights reserved.
             </p>
             <div className="flex items-center gap-6">
               <Link
