@@ -4,12 +4,11 @@ import { create } from "zustand";
 export interface User {
   id: string;
   name: string;
+  fatherName: string;
   email: string;
+  phone: number;
   image?: string;
   role?: string;
-  referralCode?: string;
-  credits?: number;
-  isEmailVerified: boolean;
 }
 
 interface UserState {
