@@ -21,7 +21,7 @@ export const userService = {
 
     setAuthToken(token);
 
-    const { data } = await api.get("/users"); 
+    const { data } = await api.get("/users/all"); 
     return data?.data;
   }
 

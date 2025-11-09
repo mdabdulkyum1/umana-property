@@ -35,10 +35,9 @@ export default function CheckoutPage() {
 
     setLoading(true);
     try {
-      // Simple payment processing - you can integrate with your backend here
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000/api/v1";
+
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
       
-      // Create purchase for each item in cart
       const purchasePromises = items.map(item => 
         fetch(`${backendUrl}/purchases/`, {
           method: 'POST',
