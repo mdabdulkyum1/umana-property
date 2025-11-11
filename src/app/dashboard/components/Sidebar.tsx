@@ -1,19 +1,31 @@
 "use client";
+
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, User, Settings, Menu, X, UsersRound } from "lucide-react";
 import { useState } from "react";
 
-const links = [
+ 
+
+export default function Sidebar() {
+
+   const { data: session } = useSession();
+
+   console.log(session?.user?.role);
+  
+   const pathname = usePathname();
+   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+   
+  const links = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/dashboard/profile", label: "Profile", icon: User },
-  { href: "/dashboard/users", label: "Users", icon: UsersRound },
+  ...(session?.user?.role === "ADMIN"
+    ? [{ href: "/dashboard/users", label: "Users", icon: UsersRound }]
+    : []),
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
-export default function Sidebar() {
-  const pathname = usePathname();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <>

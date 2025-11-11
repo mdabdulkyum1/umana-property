@@ -5,6 +5,7 @@ import { userService } from "@/app/services/userService";
 import { paymentService } from "@/app/services/paymentService";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface IUser {
   id: string;
@@ -19,6 +20,7 @@ interface IUser {
 
 const UsersPage = () => {
   const { data: session } = useSession();
+   const router = useRouter(); // ✅
   const token = session?.accessToken;
   const [users, setUsers] = useState<IUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,6 +31,13 @@ const UsersPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
   const [amount, setAmount] = useState("");
+
+ useEffect(() => {
+    if (status === "loading") return; 
+    if (session?.user?.role !== "ADMIN") {
+      router.replace("/dashboard");
+    }
+  }, [session, router]);
 
   // ✅ fetch users (memoized)
   const fetchUsers = useCallback(async () => {
