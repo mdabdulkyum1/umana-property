@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, User, Settings, Menu, X, UsersRound } from "lucide-react";
+import { Home, User, Settings, Menu, X, UsersRound, TrendingUp } from "lucide-react";
 import { useState } from "react";
 
  
@@ -19,11 +19,14 @@ export default function Sidebar() {
    
   const links = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
-  { href: "/dashboard/profile", label: "Profile", icon: User },
   ...(session?.user?.role === "ADMIN"
-    ? [{ href: "/dashboard/users", label: "Users", icon: UsersRound }]
+    ? [{ href: "/dashboard/investments", label: "Investments", icon: TrendingUp }]
     : []),
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
+    ...(session?.user?.role === "ADMIN"
+      ? [{ href: "/dashboard/users", label: "Users", icon: UsersRound }]
+      : []),
+      { href: "/dashboard/profile", label: "Profile", icon: User },
+      { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
 
