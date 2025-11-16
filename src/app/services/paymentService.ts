@@ -12,6 +12,15 @@ export const paymentService = {
 
     const { data } = await api.post("/payments", payload); 
     return data?.data;
+  },
+
+  getMyPayments: async (token: string) => {
+
+    setAuthToken(token);
+
+    const { data } = await api.get("/payments/my-payments");
+    return data?.data;
+
   }
 
 };
