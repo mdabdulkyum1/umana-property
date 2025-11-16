@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, User, Settings, Menu, X, UsersRound, TrendingUp } from "lucide-react";
+import { Home, User, Settings, Menu, X, UsersRound, TrendingUp, CreditCard } from "lucide-react";
 import { useState } from "react";
 
  
@@ -25,6 +25,7 @@ export default function Sidebar() {
     ...(session?.user?.role === "ADMIN"
       ? [{ href: "/dashboard/users", label: "Users", icon: UsersRound }]
       : []),
+      { href: "/dashboard/payments", label: "Payments History", icon: CreditCard },
       { href: "/dashboard/profile", label: "Profile", icon: User },
       { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
