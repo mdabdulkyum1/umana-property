@@ -20,7 +20,7 @@ export default function DashboardProfile() {
     const file = e.target.files?.[0];
     if (file) {
       setSelectedFile(file);
-      setPreview(URL.createObjectURL(file)); // show preview
+      setPreview(URL.createObjectURL(file)); 
     }
   };
 
@@ -36,9 +36,8 @@ export default function DashboardProfile() {
 
       console.log(res, " res ????")
 
-      if (res.status !== 200) throw new Error("Image upload failed!");
-
-      alert("Profile photo updated successfully!");
+      if (res) alert("Profile photo updated successfully!");
+      
     } catch (err) {
       console.error("Image upload failed:", err);
       alert("Something went wrong while uploading image!");

@@ -7,10 +7,12 @@ import { useState } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
+import { useUserStore } from "@/stores/userStore";
 
 export default function Navbar() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
+  const user = useUserStore((state) => state.user);
   const isLoggedIn = status === "authenticated";
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -75,7 +77,7 @@ export default function Navbar() {
                 <motion.div variants={navItemVariants} initial="hidden" animate="visible">
                   <Image
                     src={
-                      session?.user?.image ||
+                      user?.image ||
                       "https://ui-avatars.com/api/?name=User+Name&background=0073B1&color=fff"
                     }
                     alt="User"

@@ -2,12 +2,10 @@ import axios from "axios";
 import { clsx, ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-// Tailwind + clsx utility
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
 }
 
-// Image upload to ImgBB
 const image_upload_api = `https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMG_CLIENT_API_KEY}`;
 
 export async function imageUpload(image: File): Promise<string> {
@@ -29,7 +27,7 @@ export async function uploadMultipleImages(images: File[]): Promise<string[]> {
     });
 
     const imageUrls = await Promise.all(uploadPromises);
-    return imageUrls; // Returns an array of image URLs
+    return imageUrls; 
   } catch (error) {
     console.error("Image upload failed:", error);
     return [];
