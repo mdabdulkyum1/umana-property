@@ -5,6 +5,10 @@ interface PaymentPayload {
     amount: number;
 }
 
+interface PaymentFinePayload {
+    fine: number;
+}
+
 export const paymentService = {
   payment: async (token: string, payload: PaymentPayload) => {
 
@@ -19,6 +23,15 @@ export const paymentService = {
     setAuthToken(token);
 
     const { data } = await api.get("/payments/my-payments");
+    return data?.data;
+
+  },
+
+  updatePayments: async (token: string, id: string, payload: PaymentFinePayload ) => {
+
+    setAuthToken(token);
+
+    const { data } = await api.patch(`/payments/${id}`, payload);
     return data?.data;
 
   }

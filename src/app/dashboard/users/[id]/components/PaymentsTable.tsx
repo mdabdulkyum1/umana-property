@@ -1,5 +1,7 @@
 "use client";
 
+import { paymentService } from "@/app/services/paymentService";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
 
 interface Payment {
@@ -15,42 +17,60 @@ interface PaymentsTableProps {
   userId: string;
 }
 
-export default function PaymentsTable({ payments, userId }: PaymentsTableProps) {
+export default function PaymentsTable({ payments }: PaymentsTableProps) {
+  const { data: session } = useSession();
+  const token = (session)?.accessToken;
+
   const [rows, setRows] = useState(payments);
   const [modalOpen, setModalOpen] = useState(false);
   const [currentPayment, setCurrentPayment] = useState<Payment | null>(null);
-  const [updatedAmount, setUpdatedAmount] = useState<number | null>(null);
   const [updatedFine, setUpdatedFine] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const openModal = (payment: Payment) => {
     setCurrentPayment(payment);
-    setUpdatedAmount(payment.amount);
     setUpdatedFine(payment.fine);
     setModalOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!currentPayment) return;
+    if (updatedFine === null || updatedFine === undefined) {
+      alert("Please provide fine amount.");
+      return;
+    }
 
-    const updatedData: Partial<{ amount: number; fine: number }> = {};
-    if (updatedAmount !== currentPayment.amount) updatedData.amount = updatedAmount!;
-    if (updatedFine !== currentPayment.fine) updatedData.fine = updatedFine!;
-
-    if (Object.keys(updatedData).length === 0) {
+    if (updatedFine === currentPayment.fine) {
       alert("No changes to save.");
       return;
     }
 
-    // Update local table
-    const updatedRows = rows.map(p =>
-      p.id === currentPayment.id ? { ...p, ...updatedData } : p
-    );
-    setRows(updatedRows);
-    setModalOpen(false);
+    if (!token) {
+      alert("No token found. Please login again.");
+      return;
+    }
 
-    // Here you can call API to save updates
-    console.log("Data to send to API:", updatedData);
-    alert(`Payment ${currentPayment.id} updated!`);
+    try {
+      setLoading(true);
+
+      await paymentService.updatePayments(token, currentPayment.id, {
+        fine: updatedFine,
+      });
+
+      const updatedRows = rows.map((p) =>
+        p.id === currentPayment.id ? { ...p, fine: updatedFine } : p
+      );
+      setRows(updatedRows);
+
+      setModalOpen(false);
+      setCurrentPayment(null);
+      alert(`Payment fine updated successfully!`);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to update payment fine.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -91,7 +111,7 @@ export default function PaymentsTable({ payments, userId }: PaymentsTableProps) 
                     onClick={() => openModal(payment)}
                     className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs"
                   >
-                    Update
+                    Update Fine
                   </button>
                 </td>
               </tr>
@@ -100,29 +120,29 @@ export default function PaymentsTable({ payments, userId }: PaymentsTableProps) 
         </table>
       </div>
 
-      {/* Update Modal */}
+      {/* Update Modal – only Fine */}
       {modalOpen && currentPayment && (
         <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-xl w-96 text-center">
             <h2 className="text-xl font-semibold mb-4 text-gray-900">
-              Update Payment
+              Update Fine
             </h2>
 
-            <div className="mb-3">
-              <label className="block text-left text-gray-700 text-sm mb-1">Amount</label>
-              <input
-                type="number"
-                value={updatedAmount!}
-                onChange={(e) => setUpdatedAmount(Number(e.target.value))}
-                className="w-full px-4 py-2 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            <p className="text-sm text-gray-600 mb-3">
+              Payment ID:{" "}
+              <span className="font-mono text-xs">{currentPayment.id}</span>
+            </p>
+            <p className="text-sm text-gray-600 mb-4">
+              Amount: <span className="font-semibold">{currentPayment.amount}</span>
+            </p>
 
             <div className="mb-4">
-              <label className="block text-left text-gray-700 text-sm mb-1">Fine</label>
+              <label className="block text-left text-gray-700 text-sm mb-1">
+                Fine Amount
+              </label>
               <input
                 type="number"
-                value={updatedFine!}
+                value={updatedFine ?? 0}
                 onChange={(e) => setUpdatedFine(Number(e.target.value))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               />
@@ -131,12 +151,16 @@ export default function PaymentsTable({ payments, userId }: PaymentsTableProps) 
             <div className="flex justify-center gap-4">
               <button
                 onClick={handleSave}
-                className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm text-white"
+                disabled={loading}
+                className="bg-blue-500 hover:bg-blue-600 disabled:opacity-60 disabled:cursor-not-allowed px-4 py-2 rounded-lg text-sm text-white"
               >
-                Save
+                {loading ? "Saving..." : "Save"}
               </button>
               <button
-                onClick={() => setModalOpen(false)}
+                onClick={() => {
+                  setModalOpen(false);
+                  setCurrentPayment(null);
+                }}
                 className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg text-sm text-gray-900"
               >
                 Cancel

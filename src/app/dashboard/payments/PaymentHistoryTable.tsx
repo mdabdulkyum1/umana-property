@@ -1,4 +1,3 @@
-
 "use client";
 
 interface Payment {
@@ -24,17 +23,18 @@ export default function PaymentHistoryTable({ payments }: PaymentHistoryTablePro
     );
   }
 
+  const totalAmount = payments.reduce((sum, p) => sum + p.amount, 0);
+
   return (
     <div className="overflow-x-auto bg-white border border-gray-300 rounded-xl p-4">
       <table className="w-full text-sm text-left border-collapse">
         <thead>
           <tr className="border-b border-gray-300 bg-gray-100">
             <th className="px-4 py-2">#</th>
-            <th className="px-4 py-2">Amount</th>
-            <th className="px-4 py-2">Fine</th>
+            <th className="px-4 py-2">Amount (BDT)</th>
+            <th className="px-4 py-2">Fine (BDT)</th>
             <th className="px-4 py-2">Status</th>
             <th className="px-4 py-2">Date</th>
-            <th className="px-4 py-2">Method</th>
           </tr>
         </thead>
         <tbody>
@@ -44,13 +44,13 @@ export default function PaymentHistoryTable({ payments }: PaymentHistoryTablePro
               className="border-b border-gray-200 hover:bg-gray-50 transition"
             >
               <td className="px-4 py-2">{i + 1}</td>
-              <td className="px-4 py-2">{p.amount}</td>
+              <td className="px-4 py-2">{p.amount} BDT</td>
               <td
                 className={`px-4 py-2 ${
                   p.fine > 0 ? "text-red-500 font-medium" : "text-gray-800"
                 }`}
               >
-                {p.fine}
+                {p.fine} BDT
               </td>
               <td className="px-4 py-2">
                 <span
@@ -66,11 +66,19 @@ export default function PaymentHistoryTable({ payments }: PaymentHistoryTablePro
               <td className="px-4 py-2">
                 {new Date(p.paymentDate).toLocaleDateString()}
               </td>
-              <td className="px-4 py-2">
-                {p.paymentMethod || <span className="text-gray-400 italic">N/A</span>}
-              </td>
             </tr>
           ))}
+
+          {/* total row */}
+          <tr className="border-t border-gray-300 bg-gray-50 font-semibold">
+            <td className="px-4 py-3" colSpan={1}>
+              Total
+            </td>
+            <td className="px-4 py-3">
+              {totalAmount} BDT
+            </td>
+            <td className="px-4 py-3" colSpan={3}></td>
+          </tr>
         </tbody>
       </table>
     </div>
