@@ -1,5 +1,5 @@
 "use client";
-import { Settings, LogOut, User, Bell } from "lucide-react";
+import { Settings, LogOut, User } from "lucide-react";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
 import { useUserStore } from "@/stores/userStore";
@@ -33,10 +33,6 @@ export default function Navbar() {
 
         {/* Right Side */}
         <div className="flex items-center space-x-4">
-          {/* Notifications */}
-          <button className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-lg transition-colors duration-200">
-            <Bell className="h-5 w-5" />
-          </button>
 
           {/* User Menu */}
           <div className="relative">
@@ -44,16 +40,20 @@ export default function Navbar() {
               className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
               onClick={() => setOpen(!open)}
             >
-              <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                <Image
-                                        src={user?.image || "https://ui-avatars.com/api/?name=User+Name&background=0073B1&color=fff"}
-                                        alt="User"
-                                        width={32}
-                                        height={32}
-                                        className="rounded-full"
-                                        title={user?.name}
-                                      />
-              </div>
+               <div className="flex items-center justify-center">
+                                   <div className="w-10 h-10 min-w-9 min-h-9 rounded-full border border-[#0073B1] overflow-hidden">
+                                     <Image
+                                       src={
+                                         user?.image ||
+                                         "https://ui-avatars.com/api/?name=User+Name&background=0073B1&color=fff"
+                                       }
+                                       alt="User"
+                                       width={164}
+                                       height={164}
+                                       className="w-full h-full object-cover"
+                                     />
+                                   </div>
+                                </div>
               <div className="hidden md:block text-left">
                 <p className="text-sm font-medium text-gray-900">{user?.name}</p>
                 <p className="text-xs text-gray-500">{user?.email}</p>

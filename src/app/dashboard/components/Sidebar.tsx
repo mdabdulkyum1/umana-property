@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, User, Settings, Menu, X, UsersRound, TrendingUp, CreditCard } from "lucide-react";
 import { useState } from "react";
+import Image from "next/image";
 
  
 
@@ -57,13 +58,16 @@ export default function Sidebar() {
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="p-6 border-b border-gray-200">
-            <Link 
-              href="/" 
-              className="text-2xl font-bold text-indigo-600 hover:text-indigo-700 transition-colors duration-200"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Umana Property
-            </Link>
+           
+              <div className="flex justify-center">
+              <Link 
+                     href="/" 
+                     className="text-2xl font-bold text-indigo-600 hover:text-indigo-700 transition-colors duration-200"
+                     onClick={() => setIsMobileMenuOpen(false)}
+                   >
+                    <Image src="/logo.png" alt="Umana Property logo" width={85} height={85} />
+               </Link>
+              </div>
           </div>
 
           {/* Navigation */}

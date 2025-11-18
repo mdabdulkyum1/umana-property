@@ -91,7 +91,7 @@ export default function Navbar() {
                          title={session.user?.name || "User"}
                        />
                      </div>
-                </div>
+                  </div>
 
 
                 </motion.div>
