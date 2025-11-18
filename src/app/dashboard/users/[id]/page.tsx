@@ -38,7 +38,7 @@ export default async function UserDetailsPage({ params }: UserDetailsPageProps) 
       <div className="max-w-5xl mx-auto bg-white rounded-xl border border-gray-300 p-6 flex items-center gap-4">
         <div className="relative w-20 h-20 rounded-full overflow-hidden border border-gray-300">
           <Image
-            src={user.image || "/default-avatar.png"}
+            src={user?.image || "/default-avatar.png"}
             alt={user.name || "User Avatar"}
             fill
             className="object-cover"

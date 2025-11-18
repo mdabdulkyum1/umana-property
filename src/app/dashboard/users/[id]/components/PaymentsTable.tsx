@@ -107,12 +107,25 @@ export default function PaymentsTable({ payments }: PaymentsTableProps) {
                   {new Date(payment.paymentDate).toLocaleDateString()}
                 </td>
                 <td className="px-4 py-2">
-                  <button
-                    onClick={() => openModal(payment)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs"
-                  >
-                    Update Fine
-                  </button>
+                  <div className="flex justify-center gap-5">
+                      <button
+                          onClick={() => openModal(payment)}
+                          disabled={payment?.fine === 0}
+                          className={`px-3 py-1 rounded text-xs text-white 
+                            bg-blue-500 hover:bg-blue-600 cursor-pointer
+                            disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed`}
+                            >
+                          Update Fine
+                       </button>
+                      <button
+                          className={`px-3 py-1 rounded text-xs text-white 
+                            bg-blue-500 hover:bg-blue-600 cursor-pointer`}
+                            >
+                          Update Payment
+                       </button>
+
+                  </div>
+                   
                 </td>
               </tr>
             ))}

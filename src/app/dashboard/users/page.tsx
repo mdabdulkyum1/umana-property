@@ -152,7 +152,7 @@ const UsersPage = () => {
               <td className="px-4 py-3">
                 <Link href={`/dashboard/users/${user?.id}`}>
                   <Image
-                    src={user.image || "/default-avatar.png"}
+                    src={user?.image || "/default-avatar.png"}
                     alt={user.name || "User"}
                     width={40}
                     height={40}
