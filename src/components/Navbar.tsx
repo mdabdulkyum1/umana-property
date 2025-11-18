@@ -9,6 +9,7 @@ import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useUserStore } from "@/stores/userStore";
 
+
 export default function Navbar() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
@@ -34,7 +35,7 @@ export default function Navbar() {
   const hideNavbar = pathname.startsWith("/dashboard");
 
   if (!hideNavbar) {
-    return (
+    return ( 
       <motion.nav
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -42,13 +43,14 @@ export default function Navbar() {
         className="bg-white/90 backdrop-blur-lg shadow-sm sticky top-0 z-50 border-b border-[#E1E9EE]"
       >
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          {/* Logo */}
+          <div className="">
           <Link
             href="/"
-            className="text-2xl font-bold text-[#0073B1] hover:text-[#2867B2] transition-colors duration-300"
+            className="transition-colors duration-300"
           >
-            Umana Property
+            <Image src="/logo.png" alt="Umana Property logo" width={85} height={85} />
           </Link>
+          </div>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
@@ -75,17 +77,23 @@ export default function Navbar() {
             {isLoggedIn ? (
               <>
                 <motion.div variants={navItemVariants} initial="hidden" animate="visible">
-                  <Image
-                    src={
-                      user?.image ||
-                      "https://ui-avatars.com/api/?name=User+Name&background=0073B1&color=fff"
-                    }
-                    alt="User"
-                    width={36}
-                    height={36}
-                    className="rounded-full border border-[#0073B1]"
-                    title={session.user?.name || "User"}
-                  />
+                  <div className="flex items-center justify-center">
+                     <div className="w-9 h-9 min-w-9 min-h-9 rounded-full border border-[#0073B1] overflow-hidden">
+                       <Image
+                         src={
+                           user?.image ||
+                           "https://ui-avatars.com/api/?name=User+Name&background=0073B1&color=fff"
+                         }
+                         alt="User"
+                         width={144}
+                         height={144}
+                         className="w-full h-full object-cover"
+                         title={session.user?.name || "User"}
+                       />
+                     </div>
+                </div>
+
+
                 </motion.div>
 
                 <motion.div variants={navItemVariants} initial="hidden" animate="visible">
