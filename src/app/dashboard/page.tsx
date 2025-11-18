@@ -3,9 +3,9 @@
 import { useSession } from "next-auth/react";
 import { format } from "date-fns";
 import { useEffect, useState, useMemo } from "react";
-import Loading from "@/components/loading/Loading";
 import { Search, Filter, Download } from "lucide-react";
 import { dashboardService } from "@/app/services/dashboardService";
+import DashboardSkeleton from "@/components/loading/DashboardSkeleton";
 
 // ==================== TYPES ====================
 interface DashboardSummary {
@@ -150,7 +150,7 @@ export default function DashboardPage() {
   }, [users, search, filter]);
 
   // ==================== RENDER STATES ====================
-  if (status === "loading" || loading) return <Loading />;
+  if (status === "loading" || loading) return <DashboardSkeleton />;
   if (!session) return <p className="text-center text-red-600">Please sign in</p>;
   if (error) return <p className="text-center text-red-600">{error}</p>;
 
@@ -173,9 +173,8 @@ export default function DashboardPage() {
           <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-10">
             <StatCard title="Total Users" value={summary.totalUsers} color="blue" />
             <StatCard title="Total Paid" value={formatBDT(summary.totalPaidAmount)} color="green" />
-            <StatCard title="Unassigned" value={formatBDT(summary.totalUnassignedPaid)} color="yellow" />
-            <StatCard title="In Cycles" value={formatBDT(summary.totalInCycles)} color="purple" />
-            <StatCard title="Open Cycles" value={summary.openCycles} color="indigo" />
+            <StatCard title="In Investment" value={formatBDT(summary.totalInCycles)} color="purple" />
+            <StatCard title="Open Investments" value={summary.openCycles} color="indigo" />
             <StatCard title="Balance" value={formatBDT(summary.systemBalance)} color="pink" />
           </section>
         )}
