@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import UsersSkeleton from "@/components/loading/UsersSkeleton";
 
 interface IUser {
   id: string;
@@ -98,12 +99,7 @@ const UsersPage = () => {
     fetchUsers();
   }, [fetchUsers]);
 
-  if (loading)
-    return (
-      <div className="flex justify-center items-center h-64 text-gray-400">
-        Loading users...
-      </div>
-    );
+  if (loading) return <UsersSkeleton />;
 
   return (
   <div className="min-h-screen bg-gray-100 text-gray-900 p-6">

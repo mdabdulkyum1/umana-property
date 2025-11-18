@@ -1,4 +1,4 @@
-// components/loading/DashboardSkeleton.tsx
+
 export default function DashboardSkeleton() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8 animate-pulse">
