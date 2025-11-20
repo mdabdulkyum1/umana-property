@@ -5,11 +5,11 @@ import { InvestmentCycle } from "@/app/services/investmentService";
 import { CycleUpdatePayload } from "@/app/services/investmentService";
 
 const schema = z.object({
-  name: z.string().optional(),
-  totalDeposit: z.coerce.number().optional(),
-  totalProfit: z.coerce.number().optional(),
-  isInvested: z.boolean().optional(),
-  distributed: z.boolean().optional(),
+  name: z.string().min(1, "Name is required"),
+  totalDeposit: z.number().min(1, "Total deposit is required"),
+  totalProfit: z.number().min(1, "Total profit is required"),
+  isInvested: z.boolean(),
+  distributed: z.boolean(),
   endDate: z.string().optional(),
 });
 
