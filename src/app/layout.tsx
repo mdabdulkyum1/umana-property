@@ -7,7 +7,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import { userService } from "./services/userService";
 import UserProvider from "@/providers/UserProvider";
-
+import { Toaster } from "react-hot-toast";
 
 
 const geistSans = Geist({
@@ -48,6 +48,18 @@ export default async function RootLayout({
               <Navbar></Navbar>
               
               {children}
+              
+              <Toaster
+                   position="top-center"
+                   toastOptions={{
+                     style: {
+                       background: "#ffffff",   
+                       color: "#111827",        
+                       border: "1px solid #e5e7eb",
+                       fontSize: "14px",
+                     },
+                   }}
+                 />  
 
           </UserProvider>
         </NextAuthProvider>

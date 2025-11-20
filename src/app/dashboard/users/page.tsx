@@ -8,6 +8,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import UsersSkeleton from "@/components/loading/UsersSkeleton";
+import toast from "react-hot-toast";
 
 interface IUser {
   id: string;
@@ -63,11 +64,29 @@ const UsersPage = () => {
     });
   }, [users, searchTerm, filterRole]);
 
-  const handleDelete = useCallback((id: string) => {
-    if (!confirm("Are you sure you want to delete this user?")) return;
+  const handleDelete = useCallback(
+  async (id: string) => {
+    const confirmed = confirm("Are you sure you want to delete this user?");
+    if (!confirmed) return;
+
     setUsers((prev) => prev.filter((u) => u.id !== id));
-    // You can call backend delete endpoint here
-  }, []);
+
+    if (!token) return;
+
+    try {
+      const result = await userService.deleteUser(token, id);
+
+      if (result) {
+         toast.success("User deleted successfully!");
+      }
+      
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+    }
+  },
+  [token, setUsers] 
+);
+
 
   const openPaymentModal = useCallback((user: IUser) => {
     setSelectedUser(user);

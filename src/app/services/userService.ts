@@ -29,6 +29,12 @@ export const userService = {
     setAuthToken(token);
     const { data } = await api.get(`/users/get-user-payment/${id}`); 
     return data?.data;
+  },
+
+  deleteUser: async (token: string, id: string) => {
+    setAuthToken(token);
+    const { data } = await api.delete(`/users/delete/${id}`); 
+    return data?.data;
   }
 
 };
