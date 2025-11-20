@@ -7,7 +7,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import { userService } from "./services/userService";
 import UserProvider from "@/providers/UserProvider";
-import { CartProvider } from "@/providers/CartProvider";
+
 
 
 const geistSans = Geist({
@@ -44,12 +44,11 @@ export default async function RootLayout({
       >
         <NextAuthProvider>
           <UserProvider user={user}>
-            <CartProvider>
+
               <Navbar></Navbar>
               
               {children}
 
-            </CartProvider>
           </UserProvider>
         </NextAuthProvider>
       </body>
