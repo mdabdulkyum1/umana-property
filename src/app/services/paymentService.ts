@@ -6,7 +6,8 @@ interface PaymentPayload {
 }
 
 interface PaymentFinePayload {
-    fine: number;
+    fine?: number;
+    amount?: number;
 }
 
 export const paymentService = {
