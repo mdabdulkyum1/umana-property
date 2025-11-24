@@ -45,7 +45,7 @@ export const userService = {
 
   makeLeader: async (token: string, id: string) => {
     setAuthToken(token);
-    const { data } = await api.patch(`/make-leader/${id}`)
+    const { data } = await api.patch(`/users/make-leader/${id}`)
     return data?.data;
   },
 
