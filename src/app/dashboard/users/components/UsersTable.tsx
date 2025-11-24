@@ -8,6 +8,7 @@ import PaymentModal from "./PaymentModal";
 import toast from "react-hot-toast";
 import { userService } from "@/app/services/userService";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 
 export interface IUser {
@@ -121,14 +122,16 @@ export default function UsersTable({ initialUsers }: Props) {
                 >
                   <td className="px-4 py-3">{index + 1}</td>
                   <td className="px-4 py-3">
-                    <Image
-                      src={user.image || "/default-avatar.png"}
-                      alt={user.name || "User"}
-                      width={40}
-                      height={40}
-                      className="rounded-full object-cover border border-gray-300"
-                    />
-                  </td>
+                     <Link href={`/dashboard/users/${user.id}`}>
+                       <Image
+                         src={user.image || "/default-avatar.png"}
+                         alt={user.name || "User"}
+                         width={40}
+                         height={40}
+                         className="rounded-full object-cover border border-gray-300 cursor-pointer"
+                       />
+                     </Link>
+                   </td>
                   <td className="px-4 py-3">{user.name || "Unknown"}</td>
                   <td className="px-4 py-3">{user.phone}</td>
                   <td className="px-4 py-3">{user.email || "—"}</td>
