@@ -96,24 +96,27 @@ export default function UsersTable({ initialUsers }: Props) {
     setPaymentModalOpen(true);
   };
 
-  const handleToggleLeader = async (user: IUser) => {
-    try {
-      // TODO: call backend API for leader toggle
-      // await userService.updateUser(token as string, user.id, { leader: !user.leader });
+ const handleToggleLeader = async (user: IUser) => {
+  if (!token) {
+    toast.error("You are not authorized");
+    return;
+  }
 
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === user.id ? { ...u, leader: !u.leader } : u
-        )
-      );
-      toast.success(
-        !user.leader ? "User is now a leader" : "Leader role removed"
-      );
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to update leader status");
-    }
-  };
+  try {
+    const updatedUser = await userService.makeLeader(token as string, user.id);
+
+    setUsers(prev =>
+      prev.map(u => (u.id === updatedUser.id ? updatedUser : u))
+    );
+
+    toast.success(
+      updatedUser.leader ? "User is now a leader ✅" : "Leader role removed ❌"
+    );
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to update leader status");
+  }
+};
 
   const toggleMoreActions = (userId: string) => {
     setOpenActionsUserId((prev) => (prev === userId ? null : userId));

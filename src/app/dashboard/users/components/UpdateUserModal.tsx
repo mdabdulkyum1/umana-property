@@ -24,7 +24,7 @@ export default function UpdateUserModal({ user, token, onClose, onUpdate }: Prop
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const updated = await userService.updateUser(token, user.id, { name, email, phone });
+      const updated = await userService.updateUser(token, user.id, { name, phone, email });
       toast.success("User updated successfully!");
       onUpdate(updated);
     } catch (error) {
