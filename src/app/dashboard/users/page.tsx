@@ -18,6 +18,7 @@ interface IUser {
   phone: string;
   image?: string;
   role: string;
+  hasPayment: boolean;
   createdAt: string;
 }
 
@@ -157,6 +158,7 @@ const UsersPage = () => {
           <th className="px-4 py-3">Email</th>
           <th className="px-4 py-3">Role</th>
           <th className="px-4 py-3">Created</th>
+          <th className="px-4 py-3">Status</th>
           <th className="px-4 py-3 text-center">Actions</th>
         </tr>
       </thead>
@@ -183,6 +185,18 @@ const UsersPage = () => {
               <td className="px-4 py-3">{user.phone}</td>
               <td className="px-4 py-3">{user.email || "—"}</td>
               <td className="px-4 py-3">{user.role}</td>
+              <td className="text-center">
+                    {user.hasPayment ? (
+                      <span className="text-green-500 text-xl" title="Has payment this month">
+                        ✓
+                      </span>
+                    ) : (
+                      <span className="text-red-500 text-xl" title="No payment this month">
+                        ✕
+                      </span>
+                    )}
+              </td>
+
               <td className="px-4 py-3">
                 {new Date(user.createdAt).toLocaleDateString()}
               </td>
