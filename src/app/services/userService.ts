@@ -1,5 +1,11 @@
 import api, { setAuthToken } from "@/lib/api";
 
+interface updatePayload  {
+  name: string; 
+  phone: string;
+  email: string;
+}
+
 export const userService = {
   getMe: async (token: string) => {
 
@@ -28,6 +34,12 @@ export const userService = {
   getUserById: async (token: string, id: string) => {
     setAuthToken(token);
     const { data } = await api.get(`/users/get-user-payment/${id}`); 
+    return data?.data;
+  },
+
+  updateUser: async (token: string, id: string, payload: updatePayload) => {
+    setAuthToken(token);
+    const { data } = await api.patch(`/users/update/${id}`, payload); 
     return data?.data;
   },
 
