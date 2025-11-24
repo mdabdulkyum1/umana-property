@@ -15,7 +15,7 @@ export interface IUser {
   email?: string;
   phone: string;
   role: string;
-  leader?: boolean;        
+  leader?: boolean;
   image?: string;
   hasPayment: boolean;
   createdAt: string;
@@ -37,12 +37,12 @@ export default function UsersTable({ initialUsers }: Props) {
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
 
-  // ──────────────────────────────────────────────────────────────
-  // 1. Search + Role filter
-  // 2. Sorting: ADMIN → Leaders → Others (alphabetical inside groups)
-  // ──────────────────────────────────────────────────────────────
+  // which row's "More" actions are open
+  const [openActionsUserId, setOpenActionsUserId] = useState<string | null>(
+    null
+  );
+
   const filteredAndSortedUsers = useMemo(() => {
-    // 1. Filter
     const filtered = users.filter((user) => {
       const term = searchTerm.toLowerCase();
       const matchesSearch =
@@ -58,13 +58,10 @@ export default function UsersTable({ initialUsers }: Props) {
       return matchesSearch && matchesRole;
     });
 
-    // 2. Sort
     return filtered.sort((a, b) => {
-      // Priority 1: ADMIN first
       if (a.role === "ADMIN" && b.role !== "ADMIN") return -1;
       if (b.role === "ADMIN" && a.role !== "ADMIN") return 1;
 
-      // Priority 2: Leaders (leader === true) after ADMIN
       const aIsLeader = a.leader === true;
       const bIsLeader = b.leader === true;
       if (aIsLeader && !bIsLeader) return -1;
@@ -76,9 +73,6 @@ export default function UsersTable({ initialUsers }: Props) {
     });
   }, [users, searchTerm, filterRole]);
 
-  // ──────────────────────────────────────────────────────────────
-  // Handlers
-  // ──────────────────────────────────────────────────────────────
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
 
@@ -100,6 +94,29 @@ export default function UsersTable({ initialUsers }: Props) {
   const openPaymentModal = (user: IUser) => {
     setSelectedUser(user);
     setPaymentModalOpen(true);
+  };
+
+  const handleToggleLeader = async (user: IUser) => {
+    try {
+      // TODO: call backend API for leader toggle
+      // await userService.updateUser(token as string, user.id, { leader: !user.leader });
+
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === user.id ? { ...u, leader: !u.leader } : u
+        )
+      );
+      toast.success(
+        !user.leader ? "User is now a leader" : "Leader role removed"
+      );
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update leader status");
+    }
+  };
+
+  const toggleMoreActions = (userId: string) => {
+    setOpenActionsUserId((prev) => (prev === userId ? null : userId));
   };
 
   return (
@@ -183,31 +200,57 @@ export default function UsersTable({ initialUsers }: Props) {
                   <td className="px-4 py-3">
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="px-4 py-3 flex flex-wrap gap-2 justify-center">
-                    <button
-                      onClick={() => openUpdateModal(user)}
-                      className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded text-xs text-white"
-                    >
-                      Update
-                    </button>
-                    <button
-                      onClick={() => openPaymentModal(user)}
-                      className="bg-green-500 hover:bg-green-600 px-3 py-1 rounded text-xs text-white"
-                    >
-                      Pay
-                    </button>
-                    <button
-                      onClick={() => handleDelete(user.id)}
-                      className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-xs text-white"
-                    >
-                      Delete
-                    </button>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col items-center gap-1">
+                      {/* Always visible Pay button */}
+                      <button
+                        onClick={() => openPaymentModal(user)}
+                        className="bg-green-500 hover:bg-green-600 px-3 py-1 rounded text-xs text-white w-full"
+                      >
+                        Pay
+                      </button>
+
+                      {/* More button */}
+                      <button
+                        onClick={() => toggleMoreActions(user.id)}
+                        className="bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded text-xs text-gray-800 w-full"
+                      >
+                        {openActionsUserId === user.id ? "Hide" : "More"}
+                      </button>
+
+                      {/* Extra actions (Update, Delete, Make Leader) */}
+                      {openActionsUserId === user.id && (
+                        <div className="mt-1 flex flex-col gap-1 w-full">
+                          <button
+                            onClick={() => openUpdateModal(user)}
+                            className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded text-xs text-white w-full"
+                          >
+                            Update
+                          </button>
+                          <button
+                            onClick={() => handleDelete(user.id)}
+                            className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-xs text-white w-full"
+                          >
+                            Delete
+                          </button>
+                          <button
+                            onClick={() => handleToggleLeader(user)}
+                            className="bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded text-xs text-white w-full"
+                          >
+                            {user.leader ? "Remove Leader" : "Make Leader"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={10} className="text-center py-6 text-gray-500 italic">
+                <td
+                  colSpan={10}
+                  className="text-center py-6 text-gray-500 italic"
+                >
                   No users found
                 </td>
               </tr>
