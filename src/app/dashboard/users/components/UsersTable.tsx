@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo } from "react";
@@ -10,13 +9,13 @@ import { userService } from "@/app/services/userService";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 
-
 export interface IUser {
   id: string;
   name?: string;
   email?: string;
   phone: string;
   role: string;
+  leader?: boolean;        
   image?: string;
   hasPayment: boolean;
   createdAt: string;
@@ -27,37 +26,65 @@ interface Props {
 }
 
 export default function UsersTable({ initialUsers }: Props) {
-    const { data: session } = useSession();
+  const { data: session } = useSession();
+  const token = session?.accessToken;
 
   const [users, setUsers] = useState<IUser[]>(initialUsers);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState("all");
 
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
 
-  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
-
-   const token = session?.accessToken;
-
-  const filteredUsers = useMemo(() => {
-    return users.filter((user) => {
+  // ──────────────────────────────────────────────────────────────
+  // 1. Search + Role filter
+  // 2. Sorting: ADMIN → Leaders → Others (alphabetical inside groups)
+  // ──────────────────────────────────────────────────────────────
+  const filteredAndSortedUsers = useMemo(() => {
+    // 1. Filter
+    const filtered = users.filter((user) => {
       const term = searchTerm.toLowerCase();
       const matchesSearch =
-        user.name?.toLowerCase().includes(term) ||
+        (user.name?.toLowerCase().includes(term) ?? false) ||
         user.phone.includes(searchTerm) ||
-        user.email?.toLowerCase().includes(term);
-      const matchesRole = filterRole === "all" || user.role === filterRole;
+        (user.email?.toLowerCase().includes(term) ?? false);
+
+      const matchesRole =
+        filterRole === "all" ||
+        user.role === filterRole ||
+        (filterRole === "LEADER" && user.leader);
+
       return matchesSearch && matchesRole;
+    });
+
+    // 2. Sort
+    return filtered.sort((a, b) => {
+      // Priority 1: ADMIN first
+      if (a.role === "ADMIN" && b.role !== "ADMIN") return -1;
+      if (b.role === "ADMIN" && a.role !== "ADMIN") return 1;
+
+      // Priority 2: Leaders (leader === true) after ADMIN
+      const aIsLeader = a.leader === true;
+      const bIsLeader = b.leader === true;
+      if (aIsLeader && !bIsLeader) return -1;
+      if (bIsLeader && !aIsLeader) return 1;
+
+      const nameA = (a.name ?? "").trim();
+      const nameB = (b.name ?? "").trim();
+      return nameA.localeCompare(nameB);
     });
   }, [users, searchTerm, filterRole]);
 
+  // ──────────────────────────────────────────────────────────────
+  // Handlers
+  // ──────────────────────────────────────────────────────────────
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
 
     try {
-      await userService.deleteUser(token as string,id); 
-      setUsers(users.filter((u) => u.id !== id));
+      await userService.deleteUser(token as string, id);
+      setUsers((prev) => prev.filter((u) => u.id !== id));
       toast.success("User deleted successfully!");
     } catch (error) {
       console.error(error);
@@ -86,13 +113,15 @@ export default function UsersTable({ initialUsers }: Props) {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+
         <select
-          className="px-4 py-2 rounded-lg bg-white border w-full sm:w-40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-4 py-2 rounded-lg bg-white border w-full sm:w-48 focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={filterRole}
           onChange={(e) => setFilterRole(e.target.value)}
         >
           <option value="all">All Roles</option>
           <option value="ADMIN">Admin</option>
+          <option value="LEADER">Leader</option>
           <option value="USER">User</option>
         </select>
       </div>
@@ -108,34 +137,42 @@ export default function UsersTable({ initialUsers }: Props) {
               <th className="px-4 py-3">Phone</th>
               <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Role</th>
+              <th className="px-4 py-3">Leader</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Created</th>
               <th className="px-4 py-3 text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.length > 0 ? (
-              filteredUsers.map((user, index) => (
+            {filteredAndSortedUsers.length > 0 ? (
+              filteredAndSortedUsers.map((user, index) => (
                 <tr
                   key={user.id}
                   className="border-t border-gray-300 hover:bg-gray-50 transition"
                 >
                   <td className="px-4 py-3">{index + 1}</td>
                   <td className="px-4 py-3">
-                     <Link href={`/dashboard/users/${user.id}`}>
-                       <Image
-                         src={user.image || "/default-avatar.png"}
-                         alt={user.name || "User"}
-                         width={40}
-                         height={40}
-                         className="rounded-full object-cover border border-gray-300 cursor-pointer"
-                       />
-                     </Link>
-                   </td>
+                    <Link href={`/dashboard/users/${user.id}`}>
+                      <Image
+                        src={user.image || "/default-avatar.png"}
+                        alt={user.name || "User"}
+                        width={40}
+                        height={40}
+                        className="rounded-full object-cover border border-gray-300 cursor-pointer"
+                      />
+                    </Link>
+                  </td>
                   <td className="px-4 py-3">{user.name || "Unknown"}</td>
                   <td className="px-4 py-3">{user.phone}</td>
                   <td className="px-4 py-3">{user.email || "—"}</td>
                   <td className="px-4 py-3">{user.role}</td>
+                  <td className="px-4 py-3 text-center">
+                    {user.leader ? (
+                      <span className="text-yellow-600 font-bold">Yes</span>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-center">
                     {user.hasPayment ? (
                       <span className="text-green-500 text-xl">✓</span>
@@ -170,7 +207,7 @@ export default function UsersTable({ initialUsers }: Props) {
               ))
             ) : (
               <tr>
-                <td colSpan={9} className="text-center py-6 text-gray-500 italic">
+                <td colSpan={10} className="text-center py-6 text-gray-500 italic">
                   No users found
                 </td>
               </tr>
@@ -186,7 +223,9 @@ export default function UsersTable({ initialUsers }: Props) {
           token={token as string}
           onClose={() => setUpdateModalOpen(false)}
           onUpdate={(updated) => {
-            setUsers(users.map((u) => (u.id === updated.id ? updated : u)));
+            setUsers((prev) =>
+              prev.map((u) => (u.id === updated.id ? updated : u))
+            );
             setUpdateModalOpen(false);
           }}
         />
@@ -198,7 +237,6 @@ export default function UsersTable({ initialUsers }: Props) {
           token={token as string}
           onClose={() => setPaymentModalOpen(false)}
           onPaymentSuccess={async () => {
-            
             const updatedUsers = await userService.getAllUsers(token as string);
             setUsers(updatedUsers);
           }}

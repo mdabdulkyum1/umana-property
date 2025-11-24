@@ -39,7 +39,13 @@ export const userService = {
 
   updateUser: async (token: string, id: string, payload: updatePayload) => {
     setAuthToken(token);
-    const { data } = await api.patch(`/users/update/${id}`, payload); 
+    const { data } = await api.patch(`/users/update-user-by-admin/${id}`, payload); 
+    return data?.data;
+  },
+
+  makeLeader: async (token: string, id: string) => {
+    setAuthToken(token);
+    const { data } = await api.patch(`/make-leader/${id}`)
     return data?.data;
   },
 
