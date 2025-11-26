@@ -23,6 +23,8 @@ interface UserOverview {
   fatherName: string;
   phone: string;
   image: string | null;
+  role: string;
+  leader: boolean;
   createdAt: string;
   totalPaid: number;
   pendingCount: number;
@@ -117,7 +119,8 @@ export default function DashboardPage() {
         setSummary(summaryData);
         setUsers(usersData);
       } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : "Failed to load dashboard";
+        const message =
+          err instanceof Error ? err.message : "Failed to load dashboard";
         setError(message);
       } finally {
         setLoading(false);
@@ -129,24 +132,39 @@ export default function DashboardPage() {
     }
   }, [status, accessToken]);
 
-  // ==================== FILTERED DATA ====================
-  const filteredUsers = useMemo(() => {
-    return users
-      .filter((u) => {
-        const matchesSearch =
-          u.name.toLowerCase().includes(search.toLowerCase()) ||
-          u.fatherName.toLowerCase().includes(search.toLowerCase()) ||
-          u.phone.includes(search);
+  // ==================== FILTER + SORT (ADMIN → LEADER → NAME) ====================
+  const filteredAndSortedUsers = useMemo(() => {
+    const term = search.toLowerCase();
 
-        const matchesFilter =
-          filter === "all" ||
-          (filter === "paid" && u.totalPaid > 0) ||
-          (filter === "pending" && u.pendingCount > 0) ||
-          (filter === "fine" && u.totalFine > 0);
+    const filtered = users.filter((u) => {
+      const matchesSearch =
+        (u.name?.toLowerCase().includes(term) ?? false) ||
+        (u.fatherName?.toLowerCase().includes(term) ?? false) ||
+        u.phone.includes(search);
 
-        return matchesSearch && matchesFilter;
-      })
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      const matchesFilter =
+        filter === "all" ||
+        (filter === "paid" && u.totalPaid > 0) ||
+        (filter === "pending" && u.pendingCount > 0) ||
+        (filter === "fine" && u.totalFine > 0);
+
+      return matchesSearch && matchesFilter;
+    });
+
+    return filtered.sort((a, b) => {
+
+      if (a.role === "ADMIN" && b.role !== "ADMIN") return -1;
+      if (b.role === "ADMIN" && a.role !== "ADMIN") return 1;
+
+      const aIsLeader = a.leader === true;
+      const bIsLeader = b.leader === true;
+      if (aIsLeader && !bIsLeader) return -1;
+      if (bIsLeader && !aIsLeader) return 1;
+
+      const nameA = (a.name ?? "").trim();
+      const nameB = (b.name ?? "").trim();
+      return nameA.localeCompare(nameB);
+    });
   }, [users, search, filter]);
 
   // ==================== RENDER STATES ====================
@@ -157,7 +175,6 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
-
         {/* Header */}
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
@@ -172,10 +189,26 @@ export default function DashboardPage() {
         {summary && (
           <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-10">
             <StatCard title="Total Users" value={summary.totalUsers} color="blue" />
-            <StatCard title="Total Paid" value={formatBDT(summary.totalPaidAmount)} color="green" />
-            <StatCard title="In Investment" value={formatBDT(summary.totalInCycles)} color="purple" />
-            <StatCard title="Open Investments" value={summary.openCycles} color="indigo" />
-            <StatCard title="Balance" value={formatBDT(summary.systemBalance)} color="pink" />
+            <StatCard
+              title="Total Paid"
+              value={formatBDT(summary.totalPaidAmount)}
+              color="green"
+            />
+            <StatCard
+              title="In Investment"
+              value={formatBDT(summary.totalInCycles)}
+              color="purple"
+            />
+            <StatCard
+              title="Open Investments"
+              value={summary.openCycles}
+              color="indigo"
+            />
+            <StatCard
+              title="Balance"
+              value={formatBDT(summary.systemBalance)}
+              color="pink"
+            />
           </section>
         )}
 
@@ -198,7 +231,9 @@ export default function DashboardPage() {
             <Filter className="w-5 h-5 text-gray-600" />
             <select
               value={filter}
-              onChange={(e) => setFilter(e.target.value as "all" | "paid" | "pending" | "fine")}
+              onChange={(e) =>
+                setFilter(e.target.value as "all" | "paid" | "pending" | "fine")
+              }
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
             >
               <option value="all">All Users</option>
@@ -210,7 +245,7 @@ export default function DashboardPage() {
 
           {/* CSV Export */}
           <button
-            onClick={() => exportToCSV(filteredUsers, "users-overview")}
+            onClick={() => exportToCSV(filteredAndSortedUsers, "users-overview")}
             className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
           >
             <Download className="w-4 h-4" />
@@ -219,8 +254,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Users Table */}
-        <Section title={`Users Overview (${filteredUsers.length})`}>
-          {filteredUsers.length === 0 ? (
+        <Section title={`Users Overview (${filteredAndSortedUsers.length})`}>
+          {filteredAndSortedUsers.length === 0 ? (
             <p className="text-center text-gray-500 py-8">No users found.</p>
           ) : (
             <div className="overflow-x-auto">
@@ -239,7 +274,7 @@ export default function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredUsers.map((u, index) => (
+                  {filteredAndSortedUsers.map((u, index) => (
                     <tr key={u.id} className="hover:bg-gray-50 transition-colors">
                       <Td className="text-center font-medium text-gray-600">
                         {index + 1}
@@ -302,7 +337,13 @@ function StatCard({
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <h2 className="text-xl font-semibold text-gray-900 mb-4">{title}</h2>
@@ -311,7 +352,13 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-const Th = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
+const Th = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => (
   <th
     className={`px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${className}`}
   >
@@ -319,7 +366,13 @@ const Th = ({ children, className = "" }: { children: React.ReactNode; className
   </th>
 );
 
-const Td = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
+const Td = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => (
   <td className={`px-4 py-3 whitespace-nowrap text-sm text-gray-900 ${className}`}>
     {children}
   </td>
