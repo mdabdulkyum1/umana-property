@@ -49,15 +49,16 @@ export type ColorKey = keyof typeof colors;
 const formatBDT = (amount: number) => `৳${amount.toFixed(2)}`;
 
 // ==================== CSV EXPORT ====================
+
 const exportToCSV = (data: UserOverview[], filename: string) => {
   const headers = [
     "#",
     "Name",
     "Father",
     "Phone",
-    "Paid",
+    "Paid (BDT)",
     "Pending",
-    "Fine",
+    "Fine (BDT)",
     "Last Payment",
     "Joined",
   ];
@@ -67,25 +68,39 @@ const exportToCSV = (data: UserOverview[], filename: string) => {
     u.name,
     u.fatherName,
     u.phone,
-    u.totalPaid,
+    u.totalPaid.toFixed(2),
     u.pendingCount,
-    u.totalFine,
+    u.totalFine.toFixed(2),
     u.lastPaymentDate ? format(new Date(u.lastPaymentDate), "MMM dd") : "—",
     format(new Date(u.createdAt), "MMM dd, yyyy"),
   ]);
 
-  const csvContent =
-    "data:text/csv;charset=utf-8," +
-    [headers, ...rows].map((e) => e.join(",")).join("\n");
+  const escapeCSV = (value: unknown) => {
+    if (value === null || value === undefined) return "";
+    const str = String(value);
+    if (/[",\n,]/.test(str)) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
 
-  const encodedUri = encodeURI(csvContent);
+  const csvString =
+    [headers, ...rows]
+      .map((row) => row.map(escapeCSV).join(","))
+      .join("\n");
+
+  const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
   const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
+  link.href = url;
   link.setAttribute("download", `${filename}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 };
+
 
 // ==================== MAIN COMPONENT ====================
 export default function DashboardPage() {
