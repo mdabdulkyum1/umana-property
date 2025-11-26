@@ -187,7 +187,7 @@ export default function UsersTable({ initialUsers }: Props) {
                   <td className="px-4 py-3">{user.email || "—"}</td>
                   <td className="px-4 py-3">{user.role}</td>
                   <td className="px-4 py-3 text-center">
-                    {user.leader ? (
+                    {user?.leader ? (
                       <span className="text-yellow-600 font-bold">Yes</span>
                     ) : (
                       "—"
