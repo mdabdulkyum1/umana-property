@@ -3,6 +3,7 @@ import api, { setAuthToken } from "@/lib/api";
 interface PaymentPayload {
     userId: string;
     amount: number;
+    date: string;
 }
 
 interface PaymentFinePayload {
