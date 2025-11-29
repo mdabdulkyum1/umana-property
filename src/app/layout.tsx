@@ -8,6 +8,7 @@ import { authOptions } from "@/lib/authOptions";
 import { userService } from "./services/userService";
 import UserProvider from "@/providers/UserProvider";
 import { Toaster } from "react-hot-toast";
+import { redirect } from "next/navigation";
 
 
 const geistSans = Geist({
@@ -31,6 +32,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+  return redirect("/login");
+}
 
   const user = session?.accessToken ? await userService.getMe(session?.accessToken) : null;
 
