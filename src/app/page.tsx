@@ -55,7 +55,7 @@ export default function HomePage() {
             height={300}
             src="https://i.ibb.co/gLhRRj15/umana-banner.png"
             alt="Investment Illustration"
-            className="w-full max-w-md drop-shadow-xl"
+            className="w-full max-w-md drop-shadow-xl rounded-lg"
           />
         </motion.div>
       </section>
