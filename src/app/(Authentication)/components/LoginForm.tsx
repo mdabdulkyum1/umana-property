@@ -68,18 +68,17 @@ export function LoginForm() {
   };
 
   useEffect(() => {
-    async function getUser() {
-      const user = session?.accessToken
-        ? await userService.getMe(session?.accessToken)
+  if (status === "authenticated" && session) {
+    (async () => {
+      const user = session.accessToken
+        ? await userService.getMe(session.accessToken)
         : null;
-      setUser(user as IUser);
-    }
+      setUser(user as IUser); 
+      router.replace("/"); 
+    })();
+  }
+}, [status, session, router, setUser]);
 
-    if (status === "authenticated" && session) {
-      getUser();
-      router.push("/");
-    }
-  }, [status, session, router, setUser]);
 
   if (status === "loading") return <p>Loading...</p>;
 

@@ -8,10 +8,12 @@ export function middleware(req: NextRequest) {
 
   const { pathname } = req.nextUrl;
 
+  // Protect dashboard routes - redirect to login if not authenticated
   if (!token && pathname.startsWith("/dashboard")) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
+  // Redirect authenticated users away from auth pages
   if (token && (pathname === "/login" || pathname === "/register")) {
     return NextResponse.redirect(new URL("/", req.url));
   }
@@ -20,5 +22,6 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  // Match dashboard routes and auth routes
+  matcher: ["/dashboard/:path*", "/login", "/register"],
 };
