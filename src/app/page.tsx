@@ -53,7 +53,7 @@ export default function HomePage() {
           <Image
             width={500}
             height={300}
-            src="/hero-investment.svg"
+            src="https://i.ibb.co/gLhRRj15/umana-banner.png"
             alt="Investment Illustration"
             className="w-full max-w-md drop-shadow-xl"
           />

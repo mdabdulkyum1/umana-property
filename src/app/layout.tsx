@@ -6,7 +6,6 @@ import Navbar from "@/components/Navbar";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import { Toaster } from "react-hot-toast";
-import { redirect } from "next/navigation";
 import UserInitializer from "@/components/UserInitializer";
 
 
