@@ -5,10 +5,9 @@ import NextAuthProvider from "@/providers/NextAuthProvider";
 import Navbar from "@/components/Navbar";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
-import { userService } from "./services/userService";
-import UserProvider from "@/providers/UserProvider";
 import { Toaster } from "react-hot-toast";
 import { redirect } from "next/navigation";
+import UserInitializer from "@/components/UserInitializer";
 
 
 const geistSans = Geist({
@@ -34,10 +33,10 @@ export default async function RootLayout({
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
-  return redirect("/login");
-}
+    redirect("/login");
+  }
 
-  const user = session?.accessToken ? await userService.getMe(session?.accessToken) : null;
+  const accessToken = (session)?.accessToken ?? null;
 
   return (
     <html lang="en">
@@ -47,26 +46,24 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NextAuthProvider>
-          <UserProvider user={user}>
+        <NextAuthProvider session={session}>
+          <UserInitializer accessToken={accessToken} />
 
-              <Navbar></Navbar>
-              
-              {children}
-              
-              <Toaster
-                   position="top-center"
-                   toastOptions={{
-                     style: {
-                       background: "#ffffff",   
-                       color: "#111827",        
-                       border: "1px solid #e5e7eb",
-                       fontSize: "14px",
-                     },
-                   }}
-                 />  
+          <Navbar />
 
-          </UserProvider>
+          {children}
+
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              style: {
+                background: "#ffffff",
+                color: "#111827",
+                border: "1px solid #e5e7eb",
+                fontSize: "14px",
+              },
+            }}
+          />
         </NextAuthProvider>
       </body>
     </html>
