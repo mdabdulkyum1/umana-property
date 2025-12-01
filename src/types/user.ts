@@ -5,6 +5,7 @@ export interface IUser {
   email?: string;
   phone: string;
   role: string;
+  image?: string;
   leader?: boolean;
   hasPayment: boolean;
   createdAt: string;

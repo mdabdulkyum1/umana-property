@@ -1,19 +1,12 @@
 
+import { IUser } from "@/types/user";
 import { create } from "zustand";
 
-export interface User {
-  id: string;
-  name: string;
-  fatherName: string;
-  email: string;
-  phone: number;
-  image?: string;
-  role?: string;
-}
+
 
 interface UserState {
-  user: User | null;
-  setUser: (user: User) => void;
+  user: IUser | null;
+  setUser: (user: IUser) => void;
   clearUser: () => void;
 }
 

@@ -2,8 +2,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { useUserStore, User } from "@/stores/userStore";
+import { useUserStore } from "@/stores/userStore";
 import { userService } from "@/app/services/userService";
+import { IUser } from "@/types/user";
 
 interface Props {
   accessToken: string | null;
@@ -22,7 +23,7 @@ export default function UserInitializer({ accessToken }: Props) {
       }
 
       try {
-        const user = (await userService.getMe(accessToken)) as User | null;
+        const user = (await userService.getMe(accessToken)) as IUser | null;
 
         if (!isMounted) return;
 

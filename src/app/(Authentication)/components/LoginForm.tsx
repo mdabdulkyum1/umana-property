@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { userService } from "@/app/services/userService";
 import { useUserStore } from "@/stores/userStore";
+import { IUser } from "@/types/user";
 
 const formSchema = z.object({
   phone: z
@@ -28,7 +29,7 @@ export function LoginForm() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const setUser = useUserStore((state) => state.setUser);
+  const setUser = useUserStore((state) => state.setUser );
 
   const {
     register,
@@ -71,7 +72,7 @@ export function LoginForm() {
       const user = session?.accessToken
         ? await userService.getMe(session?.accessToken)
         : null;
-      setUser(user);
+      setUser(user as IUser);
     }
 
     if (status === "authenticated" && session) {

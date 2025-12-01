@@ -1,10 +1,11 @@
 "use client";
 
 import { ReactNode, useEffect } from "react";
-import { User, useUserStore } from "@/stores/userStore";
+import { useUserStore } from "@/stores/userStore";
+import { IUser } from "@/types/user";
 
 interface Props {
-  user: User | null,
+  user: IUser | null,
   children: ReactNode;
 }
 
